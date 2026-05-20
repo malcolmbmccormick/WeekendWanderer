@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { isClerkConfigured } from "@/lib/auth-config";
 import {
   createSupabaseAdminClient,
+  formatSupabaseError,
+  getSupabaseConfigError,
   isSupabaseConfigured,
   SAVED_TRIPS_TABLE,
 } from "@/lib/supabase";
@@ -22,20 +24,27 @@ export async function DELETE(
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
+    return NextResponse.json(
+      { error: getSupabaseConfigError() ?? "Supabase is not configured." },
+      { status: 503 },
+    );
   }
 
   const { id } = await params;
-  const supabase = createSupabaseAdminClient();
-  const { error } = await supabase
-    .from(SAVED_TRIPS_TABLE)
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userId);
+  try {
+    const supabase = createSupabaseAdminClient();
+    const { error } = await supabase
+      .from(SAVED_TRIPS_TABLE)
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: formatSupabaseError(error) }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: formatSupabaseError(error) }, { status: 500 });
   }
-
-  return NextResponse.json({ ok: true });
 }

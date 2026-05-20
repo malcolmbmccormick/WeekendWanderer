@@ -5,6 +5,8 @@ import { isClerkConfigured } from "@/lib/auth-config";
 import type { SavedTripRecord } from "@/lib/saved-trips";
 import {
   createSupabaseAdminClient,
+  formatSupabaseError,
+  getSupabaseConfigError,
   isSupabaseConfigured,
   SAVED_TRIPS_TABLE,
 } from "@/lib/supabase";
@@ -40,22 +42,27 @@ export default async function DashboardPage() {
   }
 
   const { userId } = await auth();
+  const supabaseConfigError = getSupabaseConfigError();
   const supabaseEnabled = isSupabaseConfigured();
   let savedTrips: SavedTripRecord[] = [];
   let loadError: string | null = null;
 
   if (supabaseEnabled) {
-    const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase
-      .from(SAVED_TRIPS_TABLE)
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+    try {
+      const supabase = createSupabaseAdminClient();
+      const { data, error } = await supabase
+        .from(SAVED_TRIPS_TABLE)
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      loadError = error.message;
-    } else {
-      savedTrips = (data ?? []) as SavedTripRecord[];
+      if (error) {
+        loadError = formatSupabaseError(error);
+      } else {
+        savedTrips = (data ?? []) as SavedTripRecord[];
+      }
+    } catch (error) {
+      loadError = formatSupabaseError(error);
     }
   }
 
@@ -92,7 +99,7 @@ export default async function DashboardPage() {
               <div className="rounded-[1.1rem] border border-border-soft bg-slate-50 p-5">
                 <p className="text-sm font-semibold text-slate-900">Supabase setup pending</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> to enable saved trips.
+                  {supabaseConfigError}
                 </p>
               </div>
             ) : loadError ? (

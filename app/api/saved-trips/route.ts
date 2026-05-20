@@ -7,6 +7,8 @@ import {
 import { isClerkConfigured } from "@/lib/auth-config";
 import {
   createSupabaseAdminClient,
+  formatSupabaseError,
+  getSupabaseConfigError,
   isSupabaseConfigured,
   SAVED_TRIPS_TABLE,
 } from "@/lib/supabase";
@@ -23,21 +25,28 @@ export async function GET() {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
+    return NextResponse.json(
+      { error: getSupabaseConfigError() ?? "Supabase is not configured." },
+      { status: 503 },
+    );
   }
 
-  const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
-    .from(SAVED_TRIPS_TABLE)
-    .select("*")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+  try {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from(SAVED_TRIPS_TABLE)
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: formatSupabaseError(error) }, { status: 500 });
+    }
+
+    return NextResponse.json({ trips: data ?? [] });
+  } catch (error) {
+    return NextResponse.json({ error: formatSupabaseError(error) }, { status: 500 });
   }
-
-  return NextResponse.json({ trips: data ?? [] });
 }
 
 export async function POST(request: Request) {
@@ -52,7 +61,10 @@ export async function POST(request: Request) {
   }
 
   if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
+    return NextResponse.json(
+      { error: getSupabaseConfigError() ?? "Supabase is not configured." },
+      { status: 503 },
+    );
   }
 
   try {
@@ -72,7 +84,10 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (duplicateCheck.error) {
-      return NextResponse.json({ error: duplicateCheck.error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: formatSupabaseError(duplicateCheck.error) },
+        { status: 500 },
+      );
     }
 
     if (duplicateCheck.data?.id) {
@@ -89,13 +104,13 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: formatSupabaseError(error) }, { status: 500 });
     }
 
     return NextResponse.json({ id: data.id }, { status: 201 });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Unable to save trip.";
+      formatSupabaseError(error);
 
     return NextResponse.json({ error: message }, { status: 400 });
   }
