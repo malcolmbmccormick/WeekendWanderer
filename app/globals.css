@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  --background: #e6f0f7;
+  --foreground: #16202a;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: #ffffff;
+  --border-soft: rgba(21, 34, 47, 0.1);
+  --accent: #1f5e7a;
+  --accent-soft: #e8f0f4;
+  --warm: #b86a4b;
+  --olive: #5d7254;
+  --ink-muted: #5f6b76;
+  --card-surface: #ffffff;
+  --card-border: rgba(21, 34, 47, 0.09);
+  --card-shadow: rgba(16, 24, 40, 0.07);
+  --button-dark: #162c3d;
+  --button-dark-hover: #0f2231;
+  --button-light: #ffffff;
+  --button-light-hover: #f5f8fa;
+  --font-sans-stack:
+    "Avenir Next", "Segoe UI", "Helvetica Neue", "Nimbus Sans", sans-serif;
+  --font-serif-stack:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-border-soft: var(--border-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warm: var(--warm);
+  --color-olive: var(--olive);
+  --color-ink-muted: var(--ink-muted);
+  --color-card-surface: var(--card-surface);
+  --color-card-border: var(--card-border);
+  --font-sans: var(--font-sans-stack);
+  --font-serif: var(--font-serif-stack);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans-stack);
+  background-image:
+    radial-gradient(circle at top left, rgba(31, 94, 122, 0.18), transparent 30%),
+    radial-gradient(circle at top right, rgba(80, 137, 168, 0.12), transparent 26%),
+    linear-gradient(180deg, #eff6fb 0%, #e6f0f7 56%, #dae8f2 100%);
+}
+
+a,
+button,
+input,
+select {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+::selection {
+  background: rgba(38, 117, 139, 0.2);
+}
+
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 18px 38px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.trip-card {
+  background: var(--card-surface);
+  box-shadow:
+    0 16px 36px var(--card-shadow),
+    0 0 0 1px var(--card-border);
+}
+
+.trip-accent-culture {
+  box-shadow:
+    inset 0 4px 0 rgba(38, 117, 139, 0.95),
+    0 16px 40px var(--card-shadow),
+    0 0 0 1px var(--card-border);
+}
+
+.trip-accent-nightlife {
+  box-shadow:
+    inset 0 4px 0 rgba(201, 108, 74, 0.95),
+    0 16px 40px var(--card-shadow),
+    0 0 0 1px var(--card-border);
+}
+
+.trip-accent-nature {
+  box-shadow:
+    inset 0 4px 0 rgba(108, 123, 82, 0.95),
+    0 16px 40px var(--card-shadow),
+    0 0 0 1px var(--card-border);
+}
+
+.trip-accent-balanced {
+  box-shadow:
+    inset 0 4px 0 rgba(96, 111, 105, 0.9),
+    0 16px 40px var(--card-shadow),
+    0 0 0 1px var(--card-border);
+}
+
+.grid-fade {
+  position: relative;
+}
+
+.grid-fade::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255, 255, 255, 0.6), transparent 18%),
+    radial-gradient(circle at 88% 16%, rgba(31, 94, 122, 0.15), transparent 24%),
+    radial-gradient(circle at 84% 72%, rgba(80, 137, 168, 0.08), transparent 18%);
+  z-index: -1;
+}
+
+.compact-label {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.med-button-dark {
+  background: var(--button-dark);
+  color: #fffdf8;
+  box-shadow: 0 10px 24px rgba(15, 34, 49, 0.16);
+}
+
+.med-button-dark:hover {
+  background: var(--button-dark-hover);
+}
+
+.med-button-light {
+  background: var(--button-light);
+  color: #22313d;
+  border-color: rgba(21, 34, 47, 0.14);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.med-button-light:hover {
+  background: var(--button-light-hover);
+}
