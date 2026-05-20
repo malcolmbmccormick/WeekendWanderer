@@ -3,6 +3,11 @@ import type {
   GenerateTripResponse,
   TripOption,
 } from "@/lib/trips";
+import {
+  buildStaySearchLink,
+  buildTransportSearchLink,
+  normalizeStayProvider,
+} from "@/lib/travel-links";
 
 export type SaveTripPayload = {
   request: GenerateTripRequest;
@@ -96,6 +101,8 @@ export function buildSavedTripInsert(
   payload: SaveTripPayload,
 ): Omit<SavedTripRecord, "id" | "created_at"> {
   const { request, trip, meta } = payload;
+  const locationLabel = `${trip.destinationCity}, ${trip.destinationCountry}`;
+  const stayProvider = normalizeStayProvider(trip.stayProvider);
 
   return {
     user_id: userId,
@@ -116,12 +123,21 @@ export function buildSavedTripInsert(
     estimated_cost_min: trip.estimatedCostMin,
     estimated_cost_max: trip.estimatedCostMax,
     transport_mode: trip.transportMode,
-    transport_link: trip.transportLink,
-    transport_link_status: trip.transportLinkStatus,
-    transport_link_note: trip.transportLinkNote,
-    stay_provider: trip.stayProvider,
-    stay_link: trip.stayLink,
-    stay_link_status: trip.stayLinkStatus,
+    transport_link: buildTransportSearchLink(
+      request.originCity,
+      trip.destinationCity,
+    ),
+    transport_link_status: "search_only",
+    transport_link_note:
+      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
+    stay_provider: stayProvider,
+    stay_link: buildStaySearchLink(
+      locationLabel,
+      request.departureDate,
+      request.returnDate,
+      stayProvider,
+    ),
+    stay_link_status: "search_only",
     stay_link_note: trip.stayLinkNote,
     disclaimer: trip.disclaimer,
     vibe_label: trip.vibeLabel,

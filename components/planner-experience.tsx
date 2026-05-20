@@ -9,6 +9,7 @@ import type {
   TravelPreference,
   TripOption,
 } from "@/lib/trips";
+import { safeExternalUrl } from "@/lib/travel-links";
 
 type GenerateTripMeta = GenerateTripResponse["meta"];
 
@@ -405,7 +406,7 @@ export function PlannerExperience({
             </p>
             <p className="mt-1 text-xs leading-5 text-[var(--color-ink-muted)]">
               {resultMeta.bookingLinkPolicy === "provider_search_only"
-                ? "Transport and stay buttons currently hand off to provider search pages. Verified deep links will require official provider integrations."
+                ? "Transport and stay buttons currently hand off to provider route and search pages. Verified deep links will require official provider integrations."
                 : "Transport and stay buttons are backed by verified provider search results."}
             </p>
           </div>
@@ -584,7 +585,7 @@ function TripCard({
 
       <div className="mt-4 rounded-lg border border-border-soft bg-slate-50 px-3 py-2.5 text-xs leading-5 text-[var(--color-ink-muted)]">
         {meta.bookingLinkPolicy === "provider_search_only"
-          ? "Links open provider search pages with your route intent. Pricing remains estimated until live integrations are added."
+          ? "Links open provider route or search pages. Pricing remains estimated until live integrations are added."
           : trip.disclaimer}
       </div>
 
@@ -645,8 +646,9 @@ function TripLinkButton({
     variant === "solid"
       ? "flex-1 rounded-lg bg-slate-950 px-3 py-3 text-center text-sm font-semibold text-white shadow-[0_10px_22px_rgba(15,23,42,0.14)] hover:bg-slate-900"
       : "flex-1 rounded-lg border border-border-soft bg-white px-3 py-3 text-center text-sm font-semibold text-slate-800 hover:bg-slate-50";
+  const safeHref = safeExternalUrl(href);
 
-  if (!href) {
+  if (!safeHref) {
     return (
       <span
         className={`${className} cursor-not-allowed opacity-60`}
@@ -658,7 +660,7 @@ function TripLinkButton({
   }
 
   return (
-    <a className={className} href={href} rel="noreferrer noopener" target="_blank">
+    <a className={className} href={safeHref} rel="noreferrer noopener" target="_blank">
       {label}
     </a>
   );
@@ -1054,7 +1056,7 @@ function labelForTransportLink(trip: TripOption) {
   }
 
   if (trip.transportLinkStatus === "search_only") {
-    return `Search ${trip.transportMode.toLowerCase()}`;
+    return `Open ${trip.transportMode.toLowerCase()} route`;
   }
 
   return `${trip.transportMode} unavailable`;

@@ -1,3 +1,9 @@
+import {
+  buildStaySearchLink,
+  buildTransportSearchLink,
+  normalizeStayProvider,
+} from "@/lib/travel-links";
+
 export type TravelPreference =
   | "balanced"
   | "culture"
@@ -430,12 +436,10 @@ export function buildTripOptionFromDraft(
     transportLink: buildTransportSearchLink(
       input.originCity,
       draft.destinationCity.trim(),
-      input.departureDate,
-      input.returnDate,
     ),
     transportLinkStatus: "search_only",
     transportLinkNote:
-      "This opens a provider search page with your route intent, not a verified live itinerary.",
+      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
     stayProvider,
     stayLink: buildStaySearchLink(
       locationLabel,
@@ -563,12 +567,10 @@ function buildTripOption(
     transportLink: buildTransportSearchLink(
       input.originCity,
       seed.destinationCity,
-      input.departureDate,
-      input.returnDate,
     ),
     transportLinkStatus: "search_only",
     transportLinkNote:
-      "This opens a provider search page with your route intent, not a verified live itinerary.",
+      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
     stayProvider,
     stayLink: buildStaySearchLink(
       locationLabel,
@@ -695,51 +697,6 @@ function calculateTripLengthDays(
   const diffMs = arrival.getTime() - departure.getTime();
 
   return Math.max(1, Math.round(diffMs / 86_400_000) + 1);
-}
-
-function buildTransportSearchLink(
-  originCity: string,
-  destinationCity: string,
-  departureDate: string,
-  returnDate: string,
-): string {
-  const params = new URLSearchParams({
-    locale: "en",
-    from: originCity,
-    to: destinationCity,
-    outboundDate: departureDate,
-    inboundDate: returnDate,
-  });
-
-  return `https://www.omio.com/search-frontend/results?${params.toString()}`;
-}
-
-function buildStaySearchLink(
-  locationLabel: string,
-  departureDate: string,
-  returnDate: string,
-  provider: string,
-): string {
-  const params = new URLSearchParams({
-    ss: locationLabel,
-    checkin: departureDate,
-    checkout: returnDate,
-    group_adults: "1",
-    no_rooms: "1",
-    group_children: "0",
-  });
-
-  if (provider === "Hostelworld") {
-    return `https://www.hostelworld.com/st/hostels/europe/?${params.toString()}`;
-  }
-
-  return `https://www.booking.com/searchresults.html?${params.toString()}`;
-}
-
-function normalizeStayProvider(provider: string): string {
-  return provider.toLowerCase().includes("hostel")
-    ? "Hostelworld"
-    : "Booking.com";
 }
 
 function requireText(value: unknown, field: string): string {

@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { SavedTripRecord } from "@/lib/saved-trips";
+import {
+  buildStaySearchLink,
+  buildTransportSearchLink,
+  safeExternalUrl,
+} from "@/lib/travel-links";
 
 export function SavedTripsDashboard({
   initialTrips,
@@ -65,11 +70,27 @@ export function SavedTripsDashboard({
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {trips.map((trip) => (
-          <article
-            key={trip.id}
-            className={`trip-card ${getTripAccentClass(trip.vibe_label)} rounded-[1.2rem] p-5`}
-          >
+        {trips.map((trip) => {
+          const transportLink = safeExternalUrl(
+            buildTransportSearchLink(
+              trip.origin_city,
+              trip.destination_city,
+            ),
+          );
+          const stayLink = safeExternalUrl(
+            buildStaySearchLink(
+              `${trip.destination_city}, ${trip.destination_country}`,
+              trip.departure_date,
+              trip.return_date,
+              trip.stay_provider,
+            ),
+          );
+
+          return (
+            <article
+              key={trip.id}
+              className={`trip-card ${getTripAccentClass(trip.vibe_label)} rounded-[1.2rem] p-5`}
+            >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink-muted)]">
@@ -152,20 +173,20 @@ export function SavedTripsDashboard({
             </p>
 
             <div className="mt-4 flex gap-2.5">
-              {trip.transport_link ? (
+              {transportLink ? (
                 <a
                   className="med-button-dark flex-1 rounded-lg px-3 py-3 text-center text-sm font-semibold"
-                  href={trip.transport_link}
+                  href={transportLink}
                   rel="noreferrer noopener"
                   target="_blank"
                 >
-                  Search transport
+                  Open route
                 </a>
               ) : null}
-              {trip.stay_link ? (
+              {stayLink ? (
                 <a
                   className="med-button-light flex-1 rounded-lg border px-3 py-3 text-center text-sm font-semibold"
-                  href={trip.stay_link}
+                  href={stayLink}
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -174,7 +195,8 @@ export function SavedTripsDashboard({
               ) : null}
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
