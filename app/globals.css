@@ -92,31 +92,122 @@ select {
 .brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 0.85rem;
+  max-width: 100%;
+  gap: 0.95rem;
   color: var(--foreground);
+  text-decoration: none;
 }
 
 .brand-mark {
+  position: relative;
   display: grid;
-  min-width: 3.2rem;
-  min-height: 3.2rem;
+  width: 3.75rem;
+  height: 3.75rem;
+  flex: 0 0 auto;
   place-items: center;
-  border: 1px solid rgba(21, 34, 47, 0.14);
-  border-radius: 0.95rem;
+  overflow: hidden;
+  border: 1px solid rgba(21, 34, 47, 0.18);
+  border-radius: 1.15rem;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(232, 240, 244, 0.75)),
-    linear-gradient(135deg, rgba(31, 94, 122, 0.2), rgba(184, 106, 75, 0.2));
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0 34%, rgba(255, 242, 215, 0.94) 35% 60%, rgba(228, 243, 239, 0.96) 61% 100%),
+    linear-gradient(135deg, #122637, #2f8f7b 52%, #d39b35);
   box-shadow:
-    0 12px 28px rgba(15, 34, 49, 0.12),
+    0 18px 34px rgba(15, 34, 49, 0.16),
+    0 0 0 6px rgba(255, 255, 255, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.brand-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  border: 1px solid rgba(18, 38, 55, 0.16);
+  border-radius: 0.82rem;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  right: -20%;
+  bottom: 0.65rem;
+  left: 34%;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--mint), var(--gold), var(--rose));
+  transform: rotate(-18deg);
+}
+
+.brand-lockup:hover .brand-mark {
+  box-shadow:
+    0 22px 40px rgba(15, 34, 49, 0.2),
+    0 0 0 6px rgba(255, 255, 255, 0.54),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  transform: translateY(-1px);
 }
 
 .brand-mark span {
-  font-family: var(--font-serif-stack);
-  font-size: 1.35rem;
-  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  font-family:
+    "Didot", "Bodoni 72", "Iowan Old Style", "Palatino Linotype", Georgia,
+    serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0;
   line-height: 1;
   color: #122637;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.brand-copy {
+  min-width: 0;
+}
+
+.brand-wordmark {
+  display: block;
+  font-family: var(--font-serif-stack);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 0.9;
+  color: #0e1e2c;
+}
+
+.brand-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.brand-kicker::before {
+  content: "";
+  width: 1.25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold), var(--mint));
+}
+
+@media (min-width: 640px) {
+  .brand-lockup {
+    gap: 1.05rem;
+  }
+
+  .brand-mark {
+    width: 4.8rem;
+    height: 4.8rem;
+  }
+
+  .brand-mark span {
+    font-size: 2rem;
+  }
+
+  .brand-wordmark {
+    font-size: 2.55rem;
+  }
 }
 
 .top-nav-link {
