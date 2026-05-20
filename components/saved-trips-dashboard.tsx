@@ -75,6 +75,9 @@ export function SavedTripsDashboard({
             buildTransportSearchLink(
               trip.origin_city,
               trip.destination_city,
+              trip.departure_date,
+              trip.return_date,
+              trip.transport_mode,
             ),
           );
           const stayLink = safeExternalUrl(
@@ -82,7 +85,6 @@ export function SavedTripsDashboard({
               `${trip.destination_city}, ${trip.destination_country}`,
               trip.departure_date,
               trip.return_date,
-              trip.stay_provider,
             ),
           );
 

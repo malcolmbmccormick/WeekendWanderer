@@ -102,7 +102,7 @@ export function buildSavedTripInsert(
 ): Omit<SavedTripRecord, "id" | "created_at"> {
   const { request, trip, meta } = payload;
   const locationLabel = `${trip.destinationCity}, ${trip.destinationCountry}`;
-  const stayProvider = normalizeStayProvider(trip.stayProvider);
+  const stayProvider = normalizeStayProvider();
 
   return {
     user_id: userId,
@@ -126,19 +126,22 @@ export function buildSavedTripInsert(
     transport_link: buildTransportSearchLink(
       request.originCity,
       trip.destinationCity,
+      request.departureDate,
+      request.returnDate,
+      trip.transportMode,
     ),
     transport_link_status: "search_only",
     transport_link_note:
-      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
+      "This opens Omio's public route page with requested dates in the URL. Live inventory must be confirmed on Omio.",
     stay_provider: stayProvider,
     stay_link: buildStaySearchLink(
       locationLabel,
       request.departureDate,
       request.returnDate,
-      stayProvider,
     ),
     stay_link_status: "search_only",
-    stay_link_note: trip.stayLinkNote,
+    stay_link_note:
+      "This opens Hostelworld's destination page with requested dates and guest count in the URL.",
     disclaimer: trip.disclaimer,
     vibe_label: trip.vibeLabel,
   };

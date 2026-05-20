@@ -1,5 +1,4 @@
 const ALLOWED_EXTERNAL_LINK_HOSTS = new Set([
-  "www.booking.com",
   "www.hostelworld.com",
   "www.omio.com",
 ]);
@@ -7,43 +6,55 @@ const ALLOWED_EXTERNAL_LINK_HOSTS = new Set([
 export function buildTransportSearchLink(
   originCity: string,
   destinationCity: string,
+  departureDate: string,
+  returnDate: string,
+  transportMode: string,
 ): string {
   const originSlug = slugifyCity(originCity);
   const destinationSlug = slugifyCity(destinationCity);
+  const travelMode = normalizeTransportMode(transportMode);
+  const params = new URLSearchParams({
+    locale: "en",
+    departure_date: formatDateForOmio(departureDate),
+    travel_mode: travelMode,
+  });
 
-  if (!originSlug || !destinationSlug) {
-    return "https://www.omio.com/trains";
+  if (returnDate) {
+    params.set("return_date", formatDateForOmio(returnDate));
   }
 
-  return `https://www.omio.com/trains/${originSlug}/${destinationSlug}`;
+  if (!originSlug || !destinationSlug) {
+    return `https://www.omio.com/${travelMode === "bus" ? "buses" : "trains"}?${params.toString()}`;
+  }
+
+  const routeSegment = travelMode === "bus" ? "buses" : "trains";
+
+  return `https://www.omio.com/${routeSegment}/${originSlug}/${destinationSlug}?${params.toString()}`;
 }
 
 export function buildStaySearchLink(
   locationLabel: string,
   departureDate: string,
   returnDate: string,
-  provider: string,
 ): string {
+  const { city, country } = splitLocationLabel(locationLabel);
+  const citySlug = slugifyCity(city);
+  const countrySlug = slugifyCity(country);
   const params = new URLSearchParams({
-    ss: locationLabel,
-    checkin: departureDate,
-    checkout: returnDate,
-    group_adults: "1",
-    no_rooms: "1",
-    group_children: "0",
+    dateFrom: departureDate,
+    dateTo: returnDate,
+    guests: "1",
   });
 
-  if (normalizeStayProvider(provider) === "Hostelworld") {
-    return `https://www.hostelworld.com/st/hostels/europe/?${params.toString()}`;
+  if (!citySlug || !countrySlug) {
+    return `https://www.hostelworld.com/hostels/europe/?${params.toString()}`;
   }
 
-  return `https://www.booking.com/searchresults.html?${params.toString()}`;
+  return `https://www.hostelworld.com/hostels/europe/${countrySlug}/${citySlug}/?${params.toString()}`;
 }
 
-export function normalizeStayProvider(provider: string): string {
-  return provider.toLowerCase().includes("hostel")
-    ? "Hostelworld"
-    : "Booking.com";
+export function normalizeStayProvider(): string {
+  return "Hostelworld";
 }
 
 export function safeExternalUrl(value: string | null): string | null {
@@ -76,4 +87,24 @@ function slugifyCity(value: string): string {
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function splitLocationLabel(value: string): { city: string; country: string } {
+  const [city = "", country = ""] = value.split(",").map((part) => part.trim());
+
+  return { city, country };
+}
+
+function normalizeTransportMode(value: string): "bus" | "train" {
+  return value.toLowerCase().includes("bus") ? "bus" : "train";
+}
+
+function formatDateForOmio(value: string): string {
+  const [year, month, day] = value.split("-");
+
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  return `${day}/${month}/${year}`;
 }

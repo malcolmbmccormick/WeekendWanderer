@@ -415,7 +415,7 @@ export function buildTripOptionFromDraft(
   input: GenerateTripRequest,
 ): TripOption {
   const locationLabel = `${draft.destinationCity}, ${draft.destinationCountry}`;
-  const stayProvider = normalizeStayProvider(draft.stayProvider);
+  const stayProvider = normalizeStayProvider();
   const estimatedCostMin = Math.max(70, Math.round(draft.estimatedCostMin));
   const estimatedCostMax = Math.max(
     estimatedCostMin + 20,
@@ -436,20 +436,22 @@ export function buildTripOptionFromDraft(
     transportLink: buildTransportSearchLink(
       input.originCity,
       draft.destinationCity.trim(),
+      input.departureDate,
+      input.returnDate,
+      draft.transportMode.trim(),
     ),
     transportLinkStatus: "search_only",
     transportLinkNote:
-      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
+      "This opens Omio's public route page with requested dates in the URL. Live inventory must be confirmed on Omio.",
     stayProvider,
     stayLink: buildStaySearchLink(
       locationLabel,
       input.departureDate,
       input.returnDate,
-      stayProvider,
     ),
     stayLinkStatus: "search_only",
     stayLinkNote:
-      "This opens a provider search page. Inventory and exact prefilled results are not guaranteed yet.",
+      "This opens Hostelworld's destination page with requested dates and guest count in the URL.",
     disclaimer: DEFAULT_DISCLAIMER,
     vibeLabel: draft.vibeLabel.trim(),
   };
@@ -551,7 +553,7 @@ function buildTripOption(
     seed.baseMax + offset,
   );
   const locationLabel = `${seed.destinationCity}, ${seed.destinationCountry}`;
-  const stayProvider = normalizeStayProvider(seed.stayProvider);
+  const stayProvider = normalizeStayProvider();
 
   return {
     destinationCity: seed.destinationCity,
@@ -567,20 +569,22 @@ function buildTripOption(
     transportLink: buildTransportSearchLink(
       input.originCity,
       seed.destinationCity,
+      input.departureDate,
+      input.returnDate,
+      seed.transportMode,
     ),
     transportLinkStatus: "search_only",
     transportLinkNote:
-      "This opens Omio's public route page, not a verified live itinerary for your exact dates.",
+      "This opens Omio's public route page with requested dates in the URL. Live inventory must be confirmed on Omio.",
     stayProvider,
     stayLink: buildStaySearchLink(
       locationLabel,
       input.departureDate,
       input.returnDate,
-      stayProvider,
     ),
     stayLinkStatus: "search_only",
     stayLinkNote:
-      "This opens a provider search page. Inventory and exact prefilled results are not guaranteed yet.",
+      "This opens Hostelworld's destination page with requested dates and guest count in the URL.",
     disclaimer: DEFAULT_DISCLAIMER,
     vibeLabel: seed.vibeLabel,
   };
