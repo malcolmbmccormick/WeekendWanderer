@@ -57,11 +57,13 @@ export default async function DashboardPage() {
         .order("created_at", { ascending: false });
 
       if (error) {
+        console.error("Failed to load saved trips from Supabase.", error);
         loadError = formatSupabaseError(error);
       } else {
         savedTrips = (data ?? []) as SavedTripRecord[];
       }
     } catch (error) {
+      console.error("Failed to reach Supabase while loading saved trips.", error);
       loadError = formatSupabaseError(error);
     }
   }

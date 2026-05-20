@@ -63,8 +63,7 @@ export function createSupabaseAdminClient() {
 }
 
 export function formatSupabaseError(error: unknown): string {
-  const message =
-    error instanceof Error ? error.message : "Unable to reach Supabase.";
+  const message = getErrorMessage(error);
   const lowerMessage = message.toLowerCase();
 
   if (
@@ -80,4 +79,37 @@ export function formatSupabaseError(error: unknown): string {
   }
 
   return message;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object") {
+    const candidate = error as {
+      code?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      message?: unknown;
+      name?: unknown;
+    };
+    const parts = [
+      candidate.name,
+      candidate.message,
+      candidate.code,
+      candidate.details,
+      candidate.hint,
+    ].filter((part): part is string => typeof part === "string" && part.trim().length > 0);
+
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+  }
+
+  if (typeof error === "string" && error.trim()) {
+    return error;
+  }
+
+  return "Unable to reach Supabase. Check the Vercel function logs for the underlying connection error.";
 }
