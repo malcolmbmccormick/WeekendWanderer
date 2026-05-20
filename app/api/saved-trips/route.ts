@@ -4,6 +4,7 @@ import {
   buildSavedTripInsert,
   validateSaveTripPayload,
 } from "@/lib/saved-trips";
+import { isClerkConfigured } from "@/lib/auth-config";
 import {
   createSupabaseAdminClient,
   isSupabaseConfigured,
@@ -11,6 +12,10 @@ import {
 } from "@/lib/supabase";
 
 export async function GET() {
+  if (!isClerkConfigured()) {
+    return NextResponse.json({ error: "Auth is not configured." }, { status: 503 });
+  }
+
   const { userId } = await auth();
 
   if (!userId) {
@@ -36,6 +41,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isClerkConfigured()) {
+    return NextResponse.json({ error: "Auth is not configured." }, { status: 503 });
+  }
+
   const { userId } = await auth();
 
   if (!userId) {

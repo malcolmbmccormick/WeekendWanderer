@@ -417,6 +417,7 @@ export function PlannerExperience({
                 ))
               : results.map((trip, index) => (
                   <TripCard
+                    authEnabled={authEnabled}
                     canSave={isSignedIn}
                     meta={resultMeta}
                     request={lastSubmittedRequest}
@@ -436,12 +437,14 @@ function TripCard({
   trip,
   request,
   meta,
+  authEnabled,
   canSave,
   isRecommended,
 }: {
   trip: TripOption;
   request: GenerateTripRequest;
   meta: GenerateTripMeta;
+  authEnabled: boolean;
   canSave: boolean;
   isRecommended: boolean;
 }) {
@@ -599,7 +602,11 @@ function TripCard({
       </div>
 
       <div className="mt-3">
-        {canSave ? (
+        {!authEnabled ? (
+          <span className="med-button-light block w-full rounded-lg border px-3 py-3 text-center text-sm font-semibold">
+            Auth setup pending
+          </span>
+        ) : canSave ? (
           <button
             className="med-button-light w-full rounded-lg border px-3 py-3 text-sm font-semibold disabled:opacity-60"
             disabled={isSaving || saveLabel === "Saved"}

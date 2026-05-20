@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { isClerkConfigured } from "@/lib/auth-config";
 import {
   createSupabaseAdminClient,
   isSupabaseConfigured,
@@ -10,6 +11,10 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  if (!isClerkConfigured()) {
+    return NextResponse.json({ error: "Auth is not configured." }, { status: 503 });
+  }
+
   const { userId } = await auth();
 
   if (!userId) {
